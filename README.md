@@ -1,6 +1,8 @@
 # Netflix-cgpt
  - Create React App
  - Configured Tailwind CSS
+ - Header
+ - login form
 
 # Features
  - Login/Sign up 
