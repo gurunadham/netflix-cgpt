@@ -1,22 +1,27 @@
 import React, { useRef, useState } from "react";
 import Header from "./Header";
-import {checkValidData} from "../Utils/Validate";
+import { checkValidData } from "../Utils/Validate";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import {auth} from "../Utils/firebase";
+import { auth }  from "../Utils/firebase";
+import { useNavigate } from "react-router-dom";
+import { updateProfile } from "firebase/auth";
+import { useDispatch } from "react-redux";
+import { addUser} from "../Utils/userSlice";
+
+
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [isLearnMore, setIsLearnMore] = useState(true);
   const [isErrorMessage, setErrorMessage] = useState(null)
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const name = useRef(null);
   const email = useRef(null);
   const password = useRef(null);
 
 
-  const toggleSignInForm = () => {
-    setIsSignInForm(!isSignInForm);
-  };
 
   const toggleLearnMore = () => {
     let extendMore = false;
@@ -29,22 +34,37 @@ const Login = () => {
     if (message) return;
 
     if (!isSignInForm) {
+      // Sign Up Logic
       createUserWithEmailAndPassword(
         auth,
         email.current.value,
         password.current.value
       )
         .then((userCredential) => {
-          // Signed up
           const user = userCredential.user;
-          console.log(user)
-          // ...
+          updateProfile(user, {
+            displayName: name.current.value,
+            photoURL: "https://occ-0-6247-2164.1.nflxso.net/dnm/api/v6/K6hjPJd6cR6FpVELC5Pd6ovHRSk/AAAABdpkabKqQAxyWzo6QW_ZnPz1IZLqlmNfK-t4L1VIeV1DY00JhLo_LMVFp936keDxj-V5UELAVJrU--iUUY2MaDxQSSO-0qw.png?r=e6e",
+          })
+            .then(() => {
+              const { uid, email, displayName, photoURL } = auth.currentUser;
+              dispatch(
+                addUser({
+                  uid: uid,
+                  email: email,
+                  displayName: displayName,
+                  photoURL: photoURL,
+                })
+              );
+            })
+            .catch((error) => {
+              setErrorMessage(error.message);
+            });
         })
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
-          setErrorMessage(errorCode+ " "+ errorMessage)
-          // ..
+          setErrorMessage(errorCode + "-" + errorMessage);
         });
     } else {
       // Sign In Logic
@@ -57,6 +77,7 @@ const Login = () => {
           // Signed in
           const user = userCredential.user;
           console.log(user)
+          navigate("/browse")
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -64,6 +85,10 @@ const Login = () => {
           setErrorMessage(errorCode + "-" + errorMessage);
         });
     }
+  };
+
+  const toggleSignInForm = () => {
+    setIsSignInForm(!isSignInForm);
   };
 
   return (
