@@ -3,31 +3,28 @@ import Header from "./Header";
 import { checkValidData } from "../Utils/Validate";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { auth }  from "../Utils/firebase";
-import { useNavigate } from "react-router-dom";
 import { updateProfile } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import { addUser} from "../Utils/userSlice";
-
-
+import { useNavigate } from "react-router-dom";
+import { USER_AVATAR } from "../Utils/constants";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [isLearnMore, setIsLearnMore] = useState(true);
-  const [isErrorMessage, setErrorMessage] = useState(null)
-  const navigate = useNavigate();
+  const [isErrorMessage, setErrorMessage] = useState(null);
   const dispatch = useDispatch();
+  // const navigate = useNavigate();
 
   const name = useRef(null);
   const email = useRef(null);
   const password = useRef(null);
 
-
-
   const toggleLearnMore = () => {
     let extendMore = false;
     setIsLearnMore(extendMore);
-  }
- 
+  };
+
   const handleButtonClick = () => {
     const message = checkValidData(email.current.value, password.current.value);
     setErrorMessage(message);
@@ -44,7 +41,7 @@ const Login = () => {
           const user = userCredential.user;
           updateProfile(user, {
             displayName: name.current.value,
-            photoURL: "https://occ-0-6247-2164.1.nflxso.net/dnm/api/v6/K6hjPJd6cR6FpVELC5Pd6ovHRSk/AAAABdpkabKqQAxyWzo6QW_ZnPz1IZLqlmNfK-t4L1VIeV1DY00JhLo_LMVFp936keDxj-V5UELAVJrU--iUUY2MaDxQSSO-0qw.png?r=e6e",
+            photoURL: USER_AVATAR
           })
             .then(() => {
               const { uid, email, displayName, photoURL } = auth.currentUser;
@@ -56,6 +53,7 @@ const Login = () => {
                   photoURL: photoURL,
                 })
               );
+              // navigate("/browse");
             })
             .catch((error) => {
               setErrorMessage(error.message);
@@ -76,8 +74,7 @@ const Login = () => {
         .then((userCredential) => {
           // Signed in
           const user = userCredential.user;
-          console.log(user)
-          navigate("/browse")
+          console.log(user);
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -100,7 +97,10 @@ const Login = () => {
           alt="log"
         />
       </div>
-      <form  onSubmit={(e)=>e.preventDefault()} className="w-3/12 absolute p-12 bg-black my-33 mx-auto right-0 left-0 text-white rounded-lg bg-opacity-80">
+      <form
+        onSubmit={(e) => e.preventDefault()}
+        className="w-3/12 absolute p-12 bg-black my-33 mx-auto right-0 left-0 text-white rounded-lg bg-opacity-80"
+      >
         <h1 className="font-bold text-3xl py-4">
           {isSignInForm ? "Sign In" : "Sign Up"}
         </h1>
@@ -127,7 +127,10 @@ const Login = () => {
           className="p-4 my-4 w-full  bg-black bg-opacity-80 text-white"
         />
         <p className="text-red-500 font-bold text-lg py-2">{isErrorMessage}</p>
-        <button className="p-4 my-4 w-full bg-red-700 rounded-lg" onClick={handleButtonClick}>
+        <button
+          className="p-4 my-4 w-full bg-red-700 rounded-lg"
+          onClick={handleButtonClick}
+        >
           {isSignInForm ? "Sign In" : "Sign Up"}
         </button>
         <p className="text-center">OR</p>
