@@ -5,7 +5,6 @@ import { useEffect } from "react";
 
 
 const useMovieTrailer = (movieId) => {
-  console.log('movieId', movieId)
   const dispatch = useDispatch();
   const trailerVideo = useSelector((store) => store.movies.trailerVideo);
 
@@ -14,7 +13,6 @@ const useMovieTrailer = (movieId) => {
       API_OPTIONS
     );
     const json = await data.json();
-    console.log("json", json);
     const filterData = json.results.filter((video) => video.type === "Trailer");
     const trailer = filterData.length ? filterData[0] : json.results[0];
     dispatch(addTrailerVideo(trailer));
